@@ -1,0 +1,146 @@
+<html>
+
+  <head>
+
+    <style>
+  
+      body{
+
+        margin: 0px;
+
+      }
+    </style>
+
+  </head>
+
+  <body>
+    <script src="three.js"></script>
+    <script src="PlanetControls.js"></script>
+
+    <script>
+
+      var scene , camera , container , renderer , mesh;
+
+      var controls;
+
+      init();
+      animate();
+
+      function init(){
+      
+        scene = new THREE.Scene();
+        
+        camera = new THREE.PerspectiveCamera( 
+          90 ,
+          window.innerWidth / window.innerHeight,
+          .5,
+          200
+        );
+
+        // placing our camera position so it can see everything
+        camera.position.z = 50;
+
+
+
+         // Getting the container in the right location
+        container     = document.createElement( 'div' );
+        container.id  = 'container';
+        
+        document.body.appendChild( container );
+
+        // Setting up our Renderer
+        renderer = new THREE.WebGLRenderer({antialias:true});
+
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        container.appendChild( renderer.domElement );
+
+
+        // Making sure our renderer is always the right size
+        window.addEventListener( 'resize', onWindowResize , false );
+
+        var geo = new THREE.IcosahedronGeometry( 20 , 4 );
+        var mat = new THREE.MeshNormalMaterial({
+          color:0xffffff
+        });
+
+        mesh = new THREE.Mesh( geo , mat );
+        scene.add( mesh );
+
+      
+
+        wf = new THREE.Mesh( geo , new THREE.MeshBasicMaterial({
+          wireframe:true,
+          color:0x000000
+        }));
+        
+        scene.add( wf );
+
+          var geo = new THREE.IcosahedronGeometry( 70 , 3 );
+        var mat = new THREE.MeshNormalMaterial({
+          side: THREE.BackSide,
+          wireframe:true
+        });
+
+        mesh = new THREE.Mesh( geo , mat );
+        scene.add( mesh );
+
+
+
+        controls = new PlanetControls( camera , 21 , 60 );
+
+        
+        var geometry = new THREE.Geometry();
+
+        var g = new THREE.CubeGeometry( 2 , .3 , .5  );
+        for( var i = 0; i < 3000; i++ ){
+
+
+          var m = new THREE.Mesh( g );
+
+          m.position.x = Math.random() - .5;
+          m.position.y = Math.random() - .5;
+          m.position.z = Math.random() - .5;
+
+          m.position.normalize();
+
+          m.position.multiplyScalar( 30  + Math.random() * 20);
+
+          m.rotation.x = Math.random() * 4;
+          m.rotation.y = Math.random() * 4;
+          m.rotation.z = Math.random() * 4;
+          m.updateMatrix();
+          geometry.merge( g , m.matrix );
+
+        }
+
+        var m = new THREE.Mesh( geometry, new THREE.MeshNormalMaterial() );
+        scene.add( m );
+
+      }
+
+      function animate(){
+
+        controls.update();
+        renderer.render( scene , camera );
+        requestAnimationFrame( animate );
+
+
+      }
+
+      // Resets the renderer to be the proper size
+      function onWindowResize(){
+
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+
+        renderer.setSize( window.innerWidth, window.innerHeight );
+
+      }
+
+
+
+
+    </script>
+  </body>
+
+</html>
